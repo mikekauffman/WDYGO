@@ -4,6 +4,10 @@
 <link href="css/style.css" rel="stylesheet" type="text/css">
 <body>
 <h1 class="Three-Dee">Where Do You Go</h1>
-</table>
+<a href=<%=authorize%>><img src="images/connect-blue.png" alt="Connect to 4sq"></a>
+<% checkins.each do |checkin| %>
+    <%= checkin %>
+<% end %>
+
 </body>
 </html>

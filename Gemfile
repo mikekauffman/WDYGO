@@ -1,6 +1,7 @@
 source "https://rubygems.org"
 
 gem 'sinatra', '~> 1.3.6'
+gem 'oauth2', '~> 0.9.3'
 
 group :development, :test do
   gem 'rspec', '~> 2.14.1'
