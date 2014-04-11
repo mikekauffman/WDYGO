@@ -20,8 +20,7 @@ class Wdygo < Sinatra::Application
 
   get '/auth/foursquare/callback' do
     access_token = params[:access_token]
-    user = access_token.get('https://api.foursquare.com/v2/users/self/checkins')
-    CHECKINS << user.inspect
+    CHECKINS << access_token
     redirect '/'
   end
 
