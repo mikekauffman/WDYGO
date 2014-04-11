@@ -10,6 +10,7 @@ class Wdygo < Sinatra::Application
   CALLBACK_PATH = 'http://wdygo.herokuapp.com/auth/foursquare/callback'
 
   get '/' do
+    CHECKINS << params[:access_token]
     auth_link = "https://foursquare.com/oauth2/authenticate?client_id=#{CLIENT_ID}&response_type=token&redirect_uri=#{CALLBACK_PATH}"
     erb :index, locals: {checkins: CHECKINS, authorize: auth_link}
   end
@@ -18,7 +19,7 @@ class Wdygo < Sinatra::Application
     "You're data is never sold"
   end
 
-  get '/auth/foursquare/callback' do
+  get '/auth/foursquare/callback/#access_token=:access_token' do
     access_token = params[:access_token]
     CHECKINS << access_token
     redirect '/'
