@@ -8,7 +8,7 @@ class Wdygo < Sinatra::Application
   CHECKINS = []
   CLIENT_ID = 'PZZRWLEPHKV1CK2DAYZXZC1QJOHVTAJSGJPUBWYRCFPD0C5A'
   CLIENT_SECRET = 'HIB3WWLEBLE2VATGRMZUVOCZZ4NLWEMDCP4VTGDY55YSMDKK'
-  CALLBACK_PATH = 'https://wdygo.herokuapp.com/auth/foursquare/callback'
+  CALLBACK_PATH = 'http://wdygo.herokuapp.com/auth/foursquare/callback'
 
   get '/' do
     auth_link = "https://foursquare.com/oauth2/authenticate?client_id=#{CLIENT_ID}&response_type=code&redirect_uri=#{CALLBACK_PATH}"
