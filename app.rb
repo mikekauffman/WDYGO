@@ -18,6 +18,7 @@ class Wdygo < Sinatra::Application
   get '/privacy' do
     "You're data is never sold"
   end
+  '/auth/foursquare/callback#access_token=AQ3DDXQTSF5L5Y0ZNQB03RC1L1DSHYLNI51YLO5E4Q3ISDEO'
 
   get '/auth/foursquare/callback#access_token=:access_token' do
     access_token = params[:access_token]
