@@ -19,7 +19,7 @@ class Wdygo < Sinatra::Application
     "You're data is never sold"
   end
 
-  get '/auth/foursquare/callback/#access_token=:access_token' do
+  get '/auth/foursquare/callback#access_token=:access_token' do
     access_token = params[:access_token]
     CHECKINS << access_token
     redirect '/'
