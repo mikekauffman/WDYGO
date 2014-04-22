@@ -4,10 +4,17 @@
 <link href="css/style.css" rel="stylesheet" type="text/css">
 <body>
 <h1 class="Three-Dee">Where Do You Go</h1>
-<a href=<%=authorize%>><img src="images/connect-blue.png" alt="Connect to 4sq"></a>
-<% tokens.each do |checkin| %>
-    <%= checkin %>
-<% end %>
+<a href=<%= authorize %>><img src="images/connect-blue.png" alt="Connect to 4sq"></a>
+<ul>
+  <% if checkins %>
+      <% checkins.each do |array| %>
+         <% array.each do |check| %>
+          <li><%= check[:venue][:name] %> at <%= check[:venue][:location][:address] %>
+            in <%= check[:venue][:location][:city] %></li>
+              <% end %>
+      <% end %>
+  <% end %>
 
+</ul>
 </body>
 </html>

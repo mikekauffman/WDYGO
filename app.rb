@@ -2,6 +2,7 @@ require 'sinatra/base'
 require 'oauth2'
 require 'json'
 require 'net/https'
+require 'open-uri'
 
 class Wdygo < Sinatra::Application
 
@@ -11,21 +12,18 @@ class Wdygo < Sinatra::Application
   CALLBACK_PATH = '/auth/foursquare/callback'
 
   def client
-    OAuth2::Client.new(CLIENT_ID, CLIENT_SECRET,
-                       {
-                         :site => 'http://foursquare.com/',
-                         :request_token_path => "/oauth2/request_token",
-                         :access_token_path => "/oauth2/access_token",
-                         :authorize_path => "/oauth2/authenticate?response_type=code",
-                         :parse_json => true,
-                         #:ssl => {:ca_path => '/etc/ssl/certs'}
-                       }
-    )
+    OAuth2::Client.new(CLIENT_ID, CLIENT_SECRET, {:site => 'http://foursquare.com/'})
   end
 
   get '/' do
     auth_link = "https://foursquare.com/oauth2/authenticate?client_id=#{CLIENT_ID}&response_type=code&redirect_uri=#{redirect_uri}"
-    erb :index, locals: {tokens: TOKENS, authorize: auth_link}
+    checkins = []
+    if TOKENS[0]
+      data_parse.each do |data|
+        checkins << data[:response][:checkins][:items]
+      end
+    end
+    erb :index, locals: {authorize: auth_link, checkins: checkins}
   end
 
   get '/privacy' do
@@ -33,20 +31,10 @@ class Wdygo < Sinatra::Application
   end
 
   get '/auth/foursquare/callback' do
-    p "BROKE BEFORE IF BLOCK"
-    if params[:code] != nil
-      p "GOT INSIDE IF BLOCK HERE: #{params[:code]}"
-      access_token = client.auth_code.get_token(params[:code], :redirect_uri => redirect_uri)
-    else
-      p "NO PARAMS CODE HERE:"
-      'Missing response from foursquare'
-    end
-      p "GOT THROUGH THE IF BLOCK HERE: #{params[:code]}"
-
-    #user = access_token.get('https://api.foursquare.com/v2/users/self')
-    #user.inspect
-
-    TOKENS << access_token
+    string = open("https://foursquare.com/oauth2/access_token?client_id=#{CLIENT_ID}&client_secret=#{CLIENT_SECRET}&grant_type=authorization_code&redirect_uri=#{redirect_uri}&code=#{params[:code]}").read
+    hash = JSON.parse(string)
+    access_token = hash['access_token']
+    TOKENS[0] = access_token
     redirect '/'
   end
 
@@ -54,11 +42,33 @@ class Wdygo < Sinatra::Application
     "Yep"
   end
 
+  private
+
   def redirect_uri()
     uri = URI.parse(request.url)
     uri.path = CALLBACK_PATH
     uri.query = nil
     uri.to_s
+  end
+
+  def data_parse
+    first_string = open("https://api.foursquare.com/v2/users/self/checkins?offset=0&limit=250&oauth_token=#{TOKENS[0]}&v=20140418").read
+    second_string = open("https://api.foursquare.com/v2/users/self/checkins?offset=250&limit=500&oauth_token=#{TOKENS[0]}&v=20140418").read
+    third_string = open("https://api.foursquare.com/v2/users/self/checkins?offset=500&limit=750&oauth_token=#{TOKENS[0]}&v=20140418").read
+    fourth_string = open("https://api.foursquare.com/v2/users/self/checkins?offset=750&limit=1000&oauth_token=#{TOKENS[0]}&v=20140418").read
+    fifth_string = open("https://api.foursquare.com/v2/users/self/checkins?offset=1000&limit=1250&oauth_token=#{TOKENS[0]}&v=20140418").read
+    data_array = []
+    d_one = JSON.parse(first_string, symbolize_names: true)
+    d_two = JSON.parse(second_string, symbolize_names: true)
+    d_three = JSON.parse(third_string, symbolize_names: true)
+    d_four = JSON.parse(fourth_string, symbolize_names: true)
+    d_five = JSON.parse(fifth_string, symbolize_names: true)
+    data_array << d_one
+    data_array << d_two
+    data_array << d_three
+    data_array << d_four
+    data_array << d_five
+    data_array
   end
 
 end
